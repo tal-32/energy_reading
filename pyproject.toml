@@ -16,3 +16,18 @@ dev = [
     "ruff>=0.15.0",         # lint
     "ty>=0.0.16",           # mypy alternative
 ]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B"]
+ignore = ["E501"]
+
+[tool.ruff.lint.isort]
+combine-as-imports = true
+force-single-line = false
+known-first-party = ["shared_lib"]
+
+[tool.ty.environment]
+python-version = "3.12"

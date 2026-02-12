@@ -1,0 +1,26 @@
+# add to git hook -> uv run pre-commit install
+# run without commit -> uv run pre-commit run --all-files
+repos:
+  - repo: local
+    hooks:
+      # 1. Format code with Ruff
+      - id: ruff-format
+        name: ruff format
+        entry: uv run ruff format
+        language: system
+        types: [python]
+
+      # 2. Lint and Fix imports with Ruff
+      - id: ruff-lint
+        name: ruff lint
+        entry: uv run ruff check --fix
+        language: system
+        types: [python]
+
+      # 3. Type check with ty
+      - id: ty-check
+        name: ty check
+        entry: uv run ty check
+        language: system
+        types: [python]
+        pass_filenames: false # ty checks the whole project at once
