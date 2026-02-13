@@ -3,11 +3,17 @@ from contextlib import asynccontextmanager
 from typing import Any
 
 import redis.asyncio as redis
-from fastapi import FastAPI, HTTPException, status
+from fastapi import FastAPI, HTTPException, Request, status
 
 from redis import RedisError
 from shared_lib.config import REDIS_URL, STREAM_NAME
-from shared_lib.model import ReadingInput, ReadingOutput, ReadingStatus
+from shared_lib.logger import logger
+from shared_lib.model import (
+    HEALTH_CHECK_DICT,
+    ReadingInput,
+    ReadingOutput,
+    ReadingStatus,
+)
 
 # This run on import, it is better to place this in a closure
 app = FastAPI()
@@ -26,13 +32,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
 @app.post(
     "/readings", response_model=ReadingOutput, status_code=status.HTTP_201_CREATED
 )
-async def create_reading(reading: ReadingInput) -> ReadingOutput:
+async def create_reading(reading: ReadingInput, request: Request) -> ReadingOutput:
+    client_ip = request.client.host if request.client else "unknown"
+    logger.debug("%s: Received new reading: %s", client_ip, reading)
     try:
         stream_id = await app.state.redis.xadd(STREAM_NAME, reading.model_dump_json())
     except RedisError as e:
+        logger.exception("%s: Redis error occurred for %s", client_ip, reading)
         # 'from e' links the Redis error to the HTTP error in the traceback
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR) from e
-
+    logger.debug("%s generated stream id for %s , %s", client_ip, reading, stream_id)
     return ReadingOutput(
         status=ReadingStatus.ACCEPTED,
         stream_id=stream_id,
@@ -40,8 +49,8 @@ async def create_reading(reading: ReadingInput) -> ReadingOutput:
 
 
 @app.get("/health")
-async def health_check():
+async def health_check(request: Request):
     """Returns 200 if the service is alive."""
-    # can check number of failed attempts
-    # missing power reading
-    return {"status": "healthy"}
+    client_ip = request.client.host if request.client else "unknown"
+    logger.debug("%s: health check", client_ip)
+    return HEALTH_CHECK_DICT
