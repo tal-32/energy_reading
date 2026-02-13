@@ -123,10 +123,7 @@ async def test_create_reading_invalid_params_value(
 
 
 @pytest.mark.asyncio
-async def test_create_reading_illogical_datetime_value() -> None:
-    """
-    testing datetime that is in the future
-    """
+async def test_create_reading_illogical_future_datetime_value() -> None:
     mock_redis = AsyncMock()
     app.state.redis = mock_redis
 

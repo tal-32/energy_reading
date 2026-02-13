@@ -32,7 +32,7 @@ typing = [
 line-length = 88
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "N", "UP", "B"]
+select = ["E", "F", "I", "N", "UP", "B", "ANN"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true

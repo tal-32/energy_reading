@@ -13,10 +13,8 @@ from shared_lib.model import (
     ReadingInput,
     ReadingOutput,
     ReadingStatus,
+    StreamData,
 )
-
-# This run on import, it is better to place this in a closure
-app = FastAPI()
 
 
 @asynccontextmanager
@@ -29,14 +27,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
         yield
 
 
+# This run on import, it is better to place this in a closure
+app = FastAPI(lifespan=lifespan)
+
+
 @app.post(
     "/readings", response_model=ReadingOutput, status_code=status.HTTP_201_CREATED
 )
 async def create_reading(reading: ReadingInput, request: Request) -> ReadingOutput:
     client_ip = request.client.host if request.client else "unknown"
     logger.debug("%s: Received new reading: %s", client_ip, reading)
+    stream_entry = StreamData(data=reading)
     try:
-        stream_id = await app.state.redis.xadd(STREAM_NAME, reading.model_dump_json())
+        stream_id = await app.state.redis.xadd(STREAM_NAME, stream_entry.model_dump())
     except RedisError as e:
         logger.exception("%s: Redis error occurred for %s", client_ip, reading)
         # 'from e' links the Redis error to the HTTP error in the traceback
@@ -49,7 +52,7 @@ async def create_reading(reading: ReadingInput, request: Request) -> ReadingOutp
 
 
 @app.get("/health")
-async def health_check(request: Request):
+async def health_check(request: Request) -> dict[str, str]:
     """Returns 200 if the service is alive."""
     client_ip = request.client.host if request.client else "unknown"
     logger.debug("%s: health check", client_ip)

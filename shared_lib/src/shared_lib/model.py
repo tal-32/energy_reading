@@ -40,6 +40,10 @@ class ReadingInput(BaseModel):
         return v
 
 
+class StreamData(BaseModel):
+    data: ReadingInput
+
+
 class ReadingOutput(BaseModel):
     status: ReadingStatus
     stream_id: str = Field(min_length=1)  # Cannot be ""

@@ -1,7 +1,7 @@
 [project]
-name = "producer"
+name = "consumer"
 version = "0.1.0"
-description = "sends energy data to redis service"
+description = "consume energy data to redis service"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
