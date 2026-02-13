@@ -1,0 +1,9 @@
+{
+  "executionEnvironments": [
+    {
+      "root": "services/consumer",
+      "venv": ".venv",
+      "venvPath": "services/consumer",
+    },
+  ],
+}

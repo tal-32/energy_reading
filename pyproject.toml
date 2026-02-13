@@ -7,14 +7,25 @@ requires-python = ">=3.12"
 dependencies = []
 
 [tool.uv.workspace]
-members = ["services/*", "shared_lib"]
+members = ["services/producer", "shared_lib"]
 
+[tool.uv.sources]
+shared_lib = { workspace = true }
+
+# uv sync --all-groups --all-packages
 [dependency-groups]
+# https://peps.python.org/pep-0735/
 dev = [
-    "pre-commit>=4.5.1",    # prevent commits without lint
-    "pytest>=9.0.2",        # test frame work
-    "ruff>=0.15.0",         # lint
-    "ty>=0.0.16",           # mypy alternative
+    "pre-commit>=4.5.1",
+    "ruff>=0.15.0",
+]
+test = [
+    "pytest>=9.0.2",
+    "pytest-asyncio>=0.23.0", # Corrected version
+    "httpx>=0.28.1",
+]
+typing = [
+    "ty>=0.0.16",
 ]
 
 [tool.ruff]
@@ -22,7 +33,6 @@ line-length = 88
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "UP", "B"]
-ignore = ["E501"]
 
 [tool.ruff.lint.isort]
 combine-as-imports = true
@@ -31,3 +41,9 @@ known-first-party = ["shared_lib"]
 
 [tool.ty.environment]
 python-version = "3.12"
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+
+testpaths = ["tests"]
+asyncio_mode = "auto"
