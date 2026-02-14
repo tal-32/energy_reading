@@ -15,7 +15,7 @@ from redis.exceptions import RedisError, ResponseError
 # Assuming these are shared with your producer
 from shared_lib.config import GROUP_NAME, REDIS_URL, STREAM_NAME
 from shared_lib.logger import logger
-from shared_lib.model import HEALTH_CHECK_DICT, StreamData
+from shared_lib.model import HEALTH_CHECK_DICT, ReadingInput
 
 # Constants for this service
 CONSUMER_NAME = os.getenv("HOSTNAME", f"default_consumer-{str(uuid.uuid4())[:8]}")
@@ -102,7 +102,7 @@ async def consume_stream(app: FastAPI) -> None:
             for message_id, payload in messages:
                 try:
                     # Validate and parse the raw_data into a ReadingInput object
-                    stream_data = StreamData.model_validate(payload)
+                    reading = ReadingInput.model_validate(payload)
                 except ValidationError as e:
                     logger.warning(
                         "Message %s from stream %s failed Pydantic validation: %s "
@@ -116,15 +116,17 @@ async def consume_stream(app: FastAPI) -> None:
                     await r.xack(STREAM_NAME, GROUP_NAME, message_id)
                     continue
 
-                site_id = stream_data.data.site_id
+                site_id = reading.site_id
 
                 # Store in a Redis List specific to the site
                 storage_key = f"readings:site:{site_id}"
+
                 try:
                     # LPUSH adds to the head, keeping latest readings first
                     # LTRIM keeps only the last 1000 readings
                     #   (optional, for memory safety)
-                    await r.lpush(storage_key, payload)
+                    # LPUSH the string, not the dict
+                    await r.lpush(storage_key, json.dumps(payload))
                     await r.ltrim(storage_key, 0, 999)
                 except redis.RedisError as e:
                     logger.error(

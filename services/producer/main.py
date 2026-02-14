@@ -13,7 +13,6 @@ from shared_lib.model import (
     ReadingInput,
     ReadingOutput,
     ReadingStatus,
-    StreamData,
 )
 
 
@@ -37,9 +36,8 @@ app = FastAPI(lifespan=lifespan)
 async def create_reading(reading: ReadingInput, request: Request) -> ReadingOutput:
     client_ip = request.client.host if request.client else "unknown"
     logger.debug("%s: Received new reading: %s", client_ip, reading)
-    stream_entry = StreamData(data=reading)
     try:
-        stream_id = await app.state.redis.xadd(STREAM_NAME, stream_entry.model_dump())
+        stream_id = await app.state.redis.xadd(STREAM_NAME, reading.model_dump())
     except RedisError as e:
         logger.exception("%s: Redis error occurred for %s", client_ip, reading)
         # 'from e' links the Redis error to the HTTP error in the traceback

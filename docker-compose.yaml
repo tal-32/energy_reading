@@ -17,7 +17,7 @@ services:
       - REDIS_HOST=redis-service # Docker DNS resolves this to the redis container IP
       - REDIS_PORT=6379
     ports:
-      - "8080:8080"
+      - "8080:8000" # Host:Container
     networks:
       - energy-net
     depends_on:

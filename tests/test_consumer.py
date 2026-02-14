@@ -6,19 +6,17 @@ import pytest
 from httpx import ASGITransport, AsyncClient, codes
 from redis.exceptions import RedisError
 
-# Adjust import based on your actual file structure
+# Adjust import based on your actual file
 from services.consumer.main import app, consume_stream
-from shared_lib.model import HEALTH_CHECK_DICT, ReadingInput, StreamData
+from shared_lib.model import HEALTH_CHECK_DICT, ReadingInput
 
 MOCK_SITE_ID = "site123"
 MOCK_STREAM_ID = "1705314600000-0"
-MOCK_PAYLOAD = StreamData(
-    data=ReadingInput(
-        site_id=MOCK_SITE_ID,
-        device_id="dev456",
-        power_reading=50.5,
-        timestamp="2024-01-15T10:30:00Z",
-    )
+MOCK_PAYLOAD = ReadingInput(
+    site_id=MOCK_SITE_ID,
+    device_id="dev456",
+    power_reading=50.5,
+    timestamp="2024-01-15T10:30:00Z",
 ).model_dump()
 
 # --- API Tests ---
@@ -87,7 +85,7 @@ async def test_consume_stream_processes_and_acks() -> None:
 
     # Verify storage
     storage_key = f"readings:site:{MOCK_SITE_ID}"
-    mock_redis.lpush.assert_called_once_with(storage_key, MOCK_PAYLOAD)
+    mock_redis.lpush.assert_called_once_with(storage_key, json.dumps(MOCK_PAYLOAD))
     mock_redis.ltrim.assert_called_once_with(storage_key, 0, 999)
     # Verify ACK
     mock_redis.xack.assert_called_once_with(ANY, ANY, MOCK_STREAM_ID)

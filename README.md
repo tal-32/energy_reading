@@ -11,6 +11,9 @@ push enery consumption info to a redis-service
 pull enery consumption info from a redis-service
 
 ## tests
+run `uv pytest` for unit tests
+there is a e2e script for manual test, decided not to automate it
+the e2e uses docker compose file
 
 ## docker
 builder is `ghcr.io/astral-sh/uv:python3.12-bookworm-slim`
