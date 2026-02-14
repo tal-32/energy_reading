@@ -56,10 +56,20 @@ redis-cli XRANGE energy_readings - +
 *validate consumer list*
 ```sh
 # validate consumer
-podman exec -it energy_reading_redis-service_1 redis-cli KEYS readings:site:*:*
+podman exec -it redis-service redis-cli KEYS readings:site:*
 1) "readings:site:e2etest123"
-podman exec -it energy_reading_redis-service_1 redis-cli LRANGE readings:site:e2etest123 0 -1
+podman exec -it redis-service redis-cli LRANGE readings:site:e2etest123 0 -1
 1) "{\"site_id\": \"e2etest123\", \"device_id\": \"e2etest456\", \"power_reading\": \"3.14\", \"timestamp\": \"2024-01-15T10:30:00Z\"}"
+```
+
+```sh # consume
+curl -v -X GET http://localhost:8081/sites/e2etest123/readings
+```
+
+```sh ## expected add and push
+redis-cli MONITOR
+771103682.200353 [0 10.89.2.12:47710] "XADD" "energy_readings" "*" "site_id" "e2etest123" "device_id" "e2etest456" "power_reading" "3.14" "timestamp" "2024-01-15T10:30:00Z"
+1771103682.201053 [0 10.89.2.13:60046] "LPUSH" "readings:site:e2etest123" "{\"site_id\": \"e2etest123\", \"device_id\": \"e2etest456\", \"power_reading\": \"3.14\", \"timestamp\": \"2024-01-15T10:30:00Z\"}"
 ```
 
 *teardown*

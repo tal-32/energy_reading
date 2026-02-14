@@ -203,6 +203,7 @@ cython_debug/
 
 # Location for local Helm
 .helm/
+deployment.yaml
 
 # Marimo
 marimo/_static/

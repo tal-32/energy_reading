@@ -1,8 +1,9 @@
 services:
   redis-service:
     image: docker.io/library/redis:7-alpine
+    container_name: redis-service
     networks:
-      - energy-net
+      - energy-reading-net
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -13,30 +14,38 @@ services:
     build:
       context: .
       dockerfile: services/producer/dockerfile
+    image: localhost/energy_reading/producer:latest
+    container_name: producer
     environment:
       - REDIS_HOST=redis-service # Docker DNS resolves this to the redis container IP
       - REDIS_PORT=6379
     ports:
       - "8080:8000" # Host:Container
     networks:
-      - energy-net
+      - energy-reading-net
     depends_on:
-      redis:
+      redis-service:
         condition: service_healthy
 
   consumer:
     build:
       context: .
       dockerfile: services/consumer/dockerfile
+    image: localhost/energy_reading/consumer:latest
+    container_name: consumer
     environment:
       - REDIS_HOST=redis-service
       - REDIS_PORT=6379
+      - STREAM_NAME=energy_readings
+      - CONSUMER_GROUP=processing_group
+    ports:
+      - "8081:8000" # Host:Container
     networks:
-      - energy-net
+      - energy-reading-net
     depends_on:
-      redis:
+      redis-service:
         condition: service_healthy
 
 networks:
-  energy-net:
+  energy-reading-net:
     driver: bridge

@@ -6,7 +6,7 @@ global:
 producer:
   replicaCount: 1
   image:
-    repository: my-registry/producer
+    repository: localhost/energy_reading/producer
     tag: latest
     pullPolicy: IfNotPresent
   service:
@@ -24,7 +24,7 @@ producer:
 consumer:
   replicaCount: 1 # KEDA will override this during scaling
   image:
-    repository: my-registry/consumer
+    repository: localhost/energy_reading/consumer
     tag: latest
     pullPolicy: IfNotPresent
   resources:
