@@ -1,0 +1,8 @@
+The Energy Reading application is deploying.
+
+Producer API: http://producer:{{ .Values.producer.service.port }}
+Redis: redis:{{ .Values.redis.port }}
+Assignment ID: {{ .Values.global.assignmentId }}
+
+KEDA will automatically scale the 'consumer' deployment based on the 
+pending entries in the Redis Stream: {{ .Values.consumer.autoscaling.streamName }}.

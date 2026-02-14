@@ -61,3 +61,8 @@ podman exec -it energy_reading_redis-service_1 redis-cli KEYS readings:site:*:*
 podman exec -it energy_reading_redis-service_1 redis-cli LRANGE readings:site:e2etest123 0 -1
 1) "{\"site_id\": \"e2etest123\", \"device_id\": \"e2etest456\", \"power_reading\": \"3.14\", \"timestamp\": \"2024-01-15T10:30:00Z\"}"
 ```
+
+*teardown*
+```sh
+podman-compose down
+```

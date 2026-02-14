@@ -13,7 +13,7 @@ from pydantic import ValidationError
 from redis.exceptions import RedisError, ResponseError
 
 # Assuming these are shared with your producer
-from shared_lib.config import GROUP_NAME, REDIS_URL, STREAM_NAME
+from shared_lib.config import CONSUMER_GROUP, REDIS_URL, STREAM_NAME
 from shared_lib.logger import logger
 from shared_lib.model import HEALTH_CHECK_DICT, ReadingInput
 
@@ -46,16 +46,16 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
             # MKSTREAM creates the stream if it doesn't exist
             await r.xgroup_create(
                 STREAM_NAME,
-                GROUP_NAME,
+                CONSUMER_GROUP,
                 id=StreamCreateStrategy.FROM_LATEST,
                 mkstream=True,
             )
         except ResponseError as e:
             if "BUSYGROUP" in str(e):
-                logger.info("Consumer group %s already exists", GROUP_NAME)
+                logger.info("Consumer group %s already exists", CONSUMER_GROUP)
             else:
                 raise e
-        logger.info("Created consumer group: %s", GROUP_NAME)
+        logger.info("Created consumer group: %s", CONSUMER_GROUP)
 
         # 3. Start the background consumer task
         consumer_task = asyncio.create_task(consume_stream(app))
@@ -87,7 +87,7 @@ async def consume_stream(app: FastAPI) -> None:
             # count=10: process in batches for efficiency
             # block=5000: wait up to 5 seconds if stream is empty
             streams = await r.xreadgroup(
-                GROUP_NAME,
+                CONSUMER_GROUP,
                 CONSUMER_NAME,
                 {STREAM_NAME: StreamReadMode.NEW_UNDELIVERED},
                 count=10,
@@ -113,7 +113,7 @@ async def consume_stream(app: FastAPI) -> None:
                         payload,
                     )
                     # Acknowledge invalid messages to prevent reprocessing bad data
-                    await r.xack(STREAM_NAME, GROUP_NAME, message_id)
+                    await r.xack(STREAM_NAME, CONSUMER_GROUP, message_id)
                     continue
 
                 site_id = reading.site_id
@@ -136,11 +136,11 @@ async def consume_stream(app: FastAPI) -> None:
                         payload,
                     )
                     # If any other error, still acknowledge to prevent stuck messages.\
-                    await r.xack(STREAM_NAME, GROUP_NAME, message_id)
+                    await r.xack(STREAM_NAME, CONSUMER_GROUP, message_id)
                     continue
 
                 # Acknowledge the message
-                await r.xack(STREAM_NAME, GROUP_NAME, message_id)
+                await r.xack(STREAM_NAME, CONSUMER_GROUP, message_id)
                 logger.debug(
                     "Processed and ACKed message %s for site %s",
                     message_id,

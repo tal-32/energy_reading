@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis
+  labels:
+    {{- include "energy-reading.labels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "redis.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "redis.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: redis
+          image: {{ .Values.redis.image }}
+          ports:
+            - containerPort: {{ .Values.redis.port }}
+          resources:
+            {{- toYaml .Values.redis.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis
+  labels:
+    {{- include "energy-reading.labels" . | nindent 4 }}
+spec:
+  ports:
+    - port: {{ .Values.redis.port }}
+      targetPort: {{ .Values.redis.port }}
+  selector:
+    {{- include "redis.selectorLabels" . | nindent 4 }}

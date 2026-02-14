@@ -1,0 +1,19 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: consumer-scaler
+  labels:
+    {{- include "energy-reading.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    name: consumer
+  minReplicaCount: {{ .Values.consumer.autoscaling.minReplicaCount }}
+  maxReplicaCount: {{ .Values.consumer.autoscaling.maxReplicaCount }}
+  triggers:
+    - type: redis-streams
+      metadata:
+        stream: {{ .Values.consumer.autoscaling.streamName }}
+        consumerGroup: {{ .Values.consumer.autoscaling.consumerGroup }}
+        pendingEntriesCount: {{ .Values.consumer.autoscaling.lagThreshold }}
+        host: "redis"
+        port: {{ .Values.redis.port | quote }}

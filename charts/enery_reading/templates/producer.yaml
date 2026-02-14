@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: producer
+  labels:
+    {{- include "energy-reading.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.producer.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "producer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "producer.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: producer
+          image: "{{ .Values.producer.image.repository }}:{{ .Values.producer.image.tag }}"
+          env:
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+          ports:
+            - containerPort: {{ .Values.producer.service.port }}
+          resources:
+            {{- toYaml .Values.producer.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: producer
+  labels:
+    {{- include "energy-reading.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.producer.service.type }}
+  ports:
+    - port: {{ .Values.producer.service.port }}
+      targetPort: {{ .Values.producer.service.port }}
+  selector:
+    {{- include "producer.selectorLabels" . | nindent 4 }}

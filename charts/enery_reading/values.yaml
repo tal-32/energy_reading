@@ -1,0 +1,52 @@
+# Global labels and configuration
+global:
+  assignmentId: "8f2c3b4a-1e9d-4c8a-9a0b-1234567890ab" # Generate your UUID here
+
+# Ingestion API (Producer)
+producer:
+  replicaCount: 1
+  image:
+    repository: my-registry/producer
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi
+    requests:
+      cpu: 100m
+      memory: 128Mi
+
+# Processing Service (Consumer)
+consumer:
+  replicaCount: 1 # KEDA will override this during scaling
+  image:
+    repository: my-registry/consumer
+    tag: latest
+    pullPolicy: IfNotPresent
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+  # KEDA Specific Config
+  autoscaling:
+    minReplicaCount: 1
+    maxReplicaCount: 10
+    streamName: "energy_readings"
+    consumerGroup: "processing_group"
+    lagThreshold: "10" # pendingEntriesCount to trigger scaling
+
+# Redis Configuration
+redis:
+  image: redis:7-alpine
+  port: 6379
+  resources:
+    limits:
+      cpu: 200m
+      memory: 256Mi

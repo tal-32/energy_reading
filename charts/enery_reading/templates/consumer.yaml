@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer
+  labels:
+    {{- include "energy-reading.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.consumer.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "consumer.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "consumer.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: consumer
+          image: "{{ .Values.consumer.image.repository }}:{{ .Values.consumer.image.tag }}"
+          env:
+            - name: REDIS_HOST
+              value: "redis"
+            - name: REDIS_PORT
+              value: {{ .Values.redis.port | quote }}
+            - name: STREAM_NAME
+              value: {{ .Values.consumer.autoscaling.streamName | quote }}
+            - name: CONSUMER_GROUP
+              value: {{ .Values.consumer.autoscaling.consumerGroup | quote }}
+          resources:
+            {{- toYaml .Values.consumer.resources | nindent 12 }}

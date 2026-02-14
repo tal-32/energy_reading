@@ -26,3 +26,6 @@ or go all the way with `MonolithPy`, though I don't think this will be worth it
 
 ## helm
 used version 4.1.1: https://get.helm.sh/helm-v4.1.1-linux-amd64.tar.gz
+.helm/helm lint charts/enery_reading
+.helm/helm template energy-release charts/enery_reading
+.helm/helm install energy-test charts/enery_reading --dry-run --debug
