@@ -1,0 +1,18 @@
+# Python artifacts
+**/__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# Project specific
+tests/
+charts/
+PLANNING.md
+LICENSE
+
+# Git
+.git/
+.gitignore

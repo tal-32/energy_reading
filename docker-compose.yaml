@@ -1,0 +1,42 @@
+services:
+  redis-service:
+    image: docker.io/library/redis:7-alpine
+    networks:
+      - energy-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  producer:
+    build:
+      context: .
+      dockerfile: services/producer/dockerfile
+    environment:
+      - REDIS_HOST=redis-service # Docker DNS resolves this to the redis container IP
+      - REDIS_PORT=6379
+    ports:
+      - "8080:8080"
+    networks:
+      - energy-net
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  consumer:
+    build:
+      context: .
+      dockerfile: services/consumer/dockerfile
+    environment:
+      - REDIS_HOST=redis-service
+      - REDIS_PORT=6379
+    networks:
+      - energy-net
+    depends_on:
+      redis:
+        condition: service_healthy
+
+networks:
+  energy-net:
+    driver: bridge

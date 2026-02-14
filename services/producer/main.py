@@ -4,8 +4,8 @@ from typing import Any
 
 import redis.asyncio as redis
 from fastapi import FastAPI, HTTPException, Request, status
-
 from redis import RedisError
+
 from shared_lib.config import REDIS_URL, STREAM_NAME
 from shared_lib.logger import logger
 from shared_lib.model import (
