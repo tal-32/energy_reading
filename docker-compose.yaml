@@ -13,7 +13,7 @@ services:
   producer:
     build:
       context: .
-      dockerfile: services/producer/dockerfile
+      dockerfile: services/producer/Dockerfile
     image: localhost/energy_reading/producer:latest
     container_name: producer
     environment:
@@ -30,7 +30,7 @@ services:
   consumer:
     build:
       context: .
-      dockerfile: services/consumer/dockerfile
+      dockerfile: services/consumer/Dockerfile
     image: localhost/energy_reading/consumer:latest
     container_name: consumer
     environment:
