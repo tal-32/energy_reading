@@ -38,7 +38,7 @@ class StreamReadMode(StrEnum):
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
     # 1. Setup Redis Connection
-    async with redis.from_url(REDIS_URL, decode_responses=True) as r:
+    async with redis.from_url(REDIS_URL, decode_responses=True) as r:  # type: ignore[no-untyped-call]
         app.state.redis = r
 
         # 2. Ensure Consumer Group exists

@@ -20,7 +20,8 @@ from shared_lib.model import (
 async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
     # 1. CONFIGURATION: This runs ONCE when the process starts.
     # We create the connection pool here.
-    async with redis.from_url(REDIS_URL, decode_responses=True) as r:
+    # add # type: ignore[no-untyped-call] to the specific line
+    async with redis.from_url(REDIS_URL, decode_responses=True) as r:  # type: ignore[no-untyped-call]
         app.state.redis = r
         # The app "pauses" here and handles all incoming requests
         yield

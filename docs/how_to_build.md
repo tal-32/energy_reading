@@ -3,6 +3,12 @@ all commands are meant to be run from project root
 ## build
 `uv sync --all-groups --all-packages`
 
+## static checks
+```sh
+uv run mypy --strict --color .
+uv run check
+```
+
 ## test
 *unit test*
 `uv run pytest`
