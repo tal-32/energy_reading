@@ -41,8 +41,13 @@ this helm version is local so it is in .helm (see .gitignore)
 .helm/helm lint charts/enery_reading
 .helm/helm template energy-release charts/enery_reading
 .helm/helm install energy-test charts/enery_reading --dry-run --debug
+.helm/helm template energy-release charts/enery_reading > deployment.yaml
 
 ## deploy
-.helm/helm template energy-release charts/enery_reading > deployment.yaml
-podman kube play deployment.yaml
-podman kube down deployment.yaml
+.helm/helm upgrade --install energy-reading ./charts/enery_reading
+.helm/helm uninstall energy-reading
+
+*king images*
+podman save localhost/energy_reading/producer:latest | podman exec -i kind-cluster-control-plane ctr -n k8s.io images import -
+podman save localhost/energy_reading/consumer:latest | podman exec -i kind-cluster-control-plane ctr -n k8s.io images import -
+podman exec -it kind-cluster-control-plane crictl images

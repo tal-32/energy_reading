@@ -14,6 +14,6 @@ spec:
       metadata:
         stream: {{ .Values.consumer.autoscaling.streamName }}
         consumerGroup: {{ .Values.consumer.autoscaling.consumerGroup }}
-        pendingEntriesCount: {{ .Values.consumer.autoscaling.lagThreshold }}
+        pendingEntriesCount: {{ .Values.consumer.autoscaling.lagThreshold | quote }}
         host: "redis"
         port: {{ .Values.redis.port | quote }}

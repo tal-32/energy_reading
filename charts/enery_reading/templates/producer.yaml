@@ -17,6 +17,7 @@ spec:
       containers:
         - name: producer
           image: "{{ .Values.producer.image.repository }}:{{ .Values.producer.image.tag }}"
+          imagePullPolicy: {{ .Values.producer.image.pullPolicy }}
           env:
             - name: REDIS_HOST
               value: "redis"
