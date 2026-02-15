@@ -36,6 +36,7 @@ consumer:
       memory: 256Mi
   # KEDA Specific Config
   autoscaling:
+    enabled: true
     minReplicaCount: 1
     maxReplicaCount: 10
     streamName: "energy_readings"

@@ -5,6 +5,7 @@ metadata:
   labels:
     {{- include "energy-reading.labels" . | nindent 4 }}
 spec:
+  # Note: KEDA will override this value once scaling starts
   replicas: {{ .Values.consumer.replicaCount }}
   selector:
     matchLabels:
@@ -20,6 +21,7 @@ spec:
           imagePullPolicy: {{ .Values.consumer.image.pullPolicy }}
           env:
             - name: REDIS_HOST
+              # Using the service name 'redis' works within the same namespace
               value: "redis"
             - name: REDIS_PORT
               value: {{ .Values.redis.port | quote }}
@@ -27,5 +29,9 @@ spec:
               value: {{ .Values.consumer.autoscaling.streamName | quote }}
             - name: CONSUMER_GROUP
               value: {{ .Values.consumer.autoscaling.consumerGroup | quote }}
+            - name: CONSUMER_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
           resources:
             {{- toYaml .Values.consumer.resources | nindent 12 }}

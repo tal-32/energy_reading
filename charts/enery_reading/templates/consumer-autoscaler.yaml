@@ -1,7 +1,9 @@
+{{- if .Values.consumer.autoscaling.enabled -}}
 apiVersion: keda.sh/v1alpha1
 kind: ScaledObject
 metadata:
   name: consumer-scaler
+  # ONLY name and labels here!
   labels:
     {{- include "energy-reading.labels" . | nindent 4 }}
 spec:
@@ -12,8 +14,10 @@ spec:
   triggers:
     - type: redis-streams
       metadata:
+        # THE FIX: Use the full internal DNS name
+        host: "redis.default.svc.cluster.local"
+        port: {{ .Values.redis.port | quote }}
         stream: {{ .Values.consumer.autoscaling.streamName }}
         consumerGroup: {{ .Values.consumer.autoscaling.consumerGroup }}
         pendingEntriesCount: {{ .Values.consumer.autoscaling.lagThreshold | quote }}
-        host: "redis"
-        port: {{ .Values.redis.port | quote }}
+{{- end }}

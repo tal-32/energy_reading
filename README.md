@@ -44,6 +44,7 @@ this helm version is local so it is in .helm (see .gitignore)
 .helm/helm template energy-release charts/enery_reading > deployment.yaml
 
 ## deploy
+#.helm/helm uninstall energy-reading  # cleanup
 .helm/helm upgrade --install energy-reading ./charts/enery_reading
 .helm/helm uninstall energy-reading
 
@@ -51,3 +52,5 @@ this helm version is local so it is in .helm (see .gitignore)
 podman save localhost/energy_reading/producer:latest | podman exec -i kind-cluster-control-plane ctr -n k8s.io images import -
 podman save localhost/energy_reading/consumer:latest | podman exec -i kind-cluster-control-plane ctr -n k8s.io images import -
 podman exec -it kind-cluster-control-plane crictl images
+
+
