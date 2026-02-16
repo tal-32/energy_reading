@@ -1,0 +1,67 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+
+      - name: Set up Python
+        run: uv python install 3.12
+
+      - name: Ruff format
+        run: uv run ruff format --check
+
+      - name: Lint with Ruff
+        run: uv run ruff check
+
+      - name: Type Check with Mypy
+        run: |
+          uv run mypy --strict .
+
+  tests:
+    needs: quality
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+      - name: Run Tests
+        run: uv run pytest tests/
+
+  helm-validation:
+      runs-on: ubuntu-latest
+      steps:
+        - uses: actions/checkout@v4
+  
+        - name: Install Helm
+          uses: azure/setup-helm@v4
+  
+        - name: Helm Lint
+          run: helm lint charts/enery_reading
+  
+        - name: Helm Template (Dry Run Generation)
+          run: |
+            helm template energy-release charts/enery_reading \
+              --values charts/enery_reading/values.yaml
+  
+        - name: Helm Install (Schema Validation)
+          # --dry-run=server is the gold standard; it checks against the K8s API
+          # If you don't have a cluster connected, use the default dry-run
+          run: |
+            helm install energy-test charts/enery_reading \
+              --dry-run \
+              --debug \
+              --namespace default
+
