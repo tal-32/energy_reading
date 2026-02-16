@@ -27,7 +27,7 @@ jobs:
         run: uv run ruff check
 
       - name: Install dependencies # also include mypy
-        run: uv sync --all-groups --all-workspace --frozen
+        run: uv sync --all-groups --all-packages --frozen
 
       - name: Type Check with Mypy
         run: |
