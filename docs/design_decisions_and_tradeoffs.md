@@ -60,3 +60,9 @@ I would probably change it for real production
 ## overkill
 Since I assumed this is going to the cloud I fiddled with `Nuitka` to see the tradeoff
 goining all out to  `MonolithPy`, is nice but very hard to maintain
+
+
+## branch
+Usually you should never work on `main` branch
+here it was a choice sense people requested to see the entire history
+otherwise the project would be `feature branch` -> PR to `main`
