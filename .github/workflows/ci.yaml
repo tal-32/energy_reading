@@ -26,6 +26,9 @@ jobs:
       - name: Lint with Ruff
         run: uv run ruff check
 
+      - name: Install dependencies # also include mypy
+        run: uv sync --frozen
+
       - name: Type Check with Mypy
         run: |
           uv run mypy --strict .
@@ -41,27 +44,26 @@ jobs:
         run: uv run pytest tests/
 
   helm-validation:
-      runs-on: ubuntu-latest
-      steps:
-        - uses: actions/checkout@v4
-  
-        - name: Install Helm
-          uses: azure/setup-helm@v4
-  
-        - name: Helm Lint
-          run: helm lint charts/enery_reading
-  
-        - name: Helm Template (Dry Run Generation)
-          run: |
-            helm template energy-release charts/enery_reading \
-              --values charts/enery_reading/values.yaml
-  
-        - name: Helm Install (Schema Validation)
-          # --dry-run=server is the gold standard; it checks against the K8s API
-          # If you don't have a cluster connected, use the default dry-run
-          run: |
-            helm install energy-test charts/enery_reading \
-              --dry-run \
-              --debug \
-              --namespace default
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
+      - name: Install Helm
+        uses: azure/setup-helm@v4
+
+      - name: Helm Lint
+        run: helm lint charts/enery_reading
+
+      - name: Helm Template (Dry Run Generation)
+        run: |
+          helm template energy-release charts/enery_reading \
+            --values charts/enery_reading/values.yaml
+
+      - name: Helm Install (Schema Validation)
+        # --dry-run=server is the gold standard; it checks against the K8s API
+        # If you don't have a cluster connected, use the default dry-run
+        run: |
+          helm install energy-test charts/enery_reading \
+            --dry-run \
+            --debug \
+            --namespace default
