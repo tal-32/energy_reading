@@ -23,4 +23,4 @@ repos:
         entry: uv run mypy --strict .
         language: system
         types: [python]
-        pass_filenames: false # ty checks the whole project at once
+        pass_filenames: false
