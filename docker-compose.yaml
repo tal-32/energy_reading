@@ -19,8 +19,6 @@ services:
     environment:
       - REDIS_HOST=redis-service # Docker DNS resolves this to the redis container IP
       - REDIS_PORT=6379
-    ports:
-      - "8080:8000" # Host:Container
     networks:
       - energy-reading-net
     depends_on:
@@ -38,13 +36,31 @@ services:
       - REDIS_PORT=6379
       - STREAM_NAME=energy_readings
       - CONSUMER_GROUP=processing_group
-    ports:
-      - "8081:8000" # Host:Container
     networks:
       - energy-reading-net
     depends_on:
       redis-service:
         condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: services/frontend/Dockerfile
+    image: localhost/energy_reading/frontend:latest
+    container_name: frontend
+    ports:
+      - "8080:8080" # This is the "bridge" from your laptop to the container
+    environment:
+      - PRODUCER_URL=http://producer:8000
+      - CONSUMER_URL=http://consumer:8000
+      - ENVIRONMENT=development
+    networks:
+      - energy-reading-net
+    depends_on:
+      producer:
+        condition: service_started
+      consumer:
+        condition: service_started
 
 networks:
   energy-reading-net:

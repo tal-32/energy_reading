@@ -41,7 +41,7 @@ consumer:
     maxReplicaCount: 10
     streamName: "energy_readings"
     consumerGroup: "processing_group"
-    lagThreshold: "10" # pendingEntriesCount to trigger scaling
+    lagThreshold: "10"
 
 # Redis Configuration
 redis:

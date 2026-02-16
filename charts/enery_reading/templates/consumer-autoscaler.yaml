@@ -19,5 +19,5 @@ spec:
         port: {{ .Values.redis.port | quote }}
         stream: {{ .Values.consumer.autoscaling.streamName }}
         consumerGroup: {{ .Values.consumer.autoscaling.consumerGroup }}
-        pendingEntriesCount: {{ .Values.consumer.autoscaling.lagThreshold | quote }}
+        lagThreshold: {{ .Values.consumer.autoscaling.lagThreshold | quote }}
 {{- end }}

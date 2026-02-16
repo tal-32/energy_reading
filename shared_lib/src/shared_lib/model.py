@@ -1,7 +1,7 @@
 from datetime import datetime
 from enum import StrEnum
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 # Formatting to ISO 8601
 DATE_FORMAT = "%Y-%m-%dT%H:%M:%SZ"
@@ -30,13 +30,13 @@ class ReadingInput(BaseModel):
         try:
             new = datetime.strptime(v, DATE_FORMAT)
         except ValueError as err:
-            raise ValueError(
+            raise ValidationError(
                 "Timestamp must be in format YYYY-MM-DDTHH:MM:SSZ"
             ) from err
 
         now = datetime.now(new.tzinfo) if new.tzinfo else datetime.now()
         if new > now:
-            raise ValueError("datetime is in the future")
+            raise ValidationError("datetime is in the future")
         return v
 
 

@@ -47,7 +47,7 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[Any, None]:
             await r.xgroup_create(
                 STREAM_NAME,
                 CONSUMER_GROUP,
-                id=StreamCreateStrategy.FROM_LATEST,
+                id=StreamCreateStrategy.FROM_START,
                 mkstream=True,
             )
         except ResponseError as e:
