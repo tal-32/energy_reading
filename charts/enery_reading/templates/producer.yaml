@@ -4,6 +4,7 @@ metadata:
   name: producer
   labels:
     {{- include "energy-reading.labels" . | nindent 4 }}
+    {{- include "producer.selectorLabels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.producer.replicaCount }}
   selector:

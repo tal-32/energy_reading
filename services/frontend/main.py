@@ -81,6 +81,7 @@ async def fetch_readings(site_id: str, container: ui.column) -> None:
 
         # Phase 2: Render Data
         container.clear()  # Removes the spinner
+        ui.notify(f"Consumer return code: {response.status_code}", type="positive")
         with container:
             if not data:
                 ui.label(f"No readings found for site '{site_id}'.").classes(
@@ -98,6 +99,12 @@ async def fetch_readings(site_id: str, container: ui.column) -> None:
                         "name": "value",
                         "label": "Reading (kWh)",
                         "field": "power_reading",
+                        "sortable": True,
+                    },
+                    {
+                        "name": "device_id",
+                        "label": "Device id",
+                        "field": "device_id",
                         "sortable": True,
                     },
                 ]

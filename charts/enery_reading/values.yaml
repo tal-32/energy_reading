@@ -27,6 +27,9 @@ consumer:
     repository: localhost/energy_reading/consumer
     tag: latest
     pullPolicy: IfNotPresent
+  service:
+    type: ClusterIP
+    port: 8000
   resources:
     limits:
       cpu: 500m
@@ -43,10 +46,33 @@ consumer:
     consumerGroup: "processing_group"
     lagThreshold: "10"
 
+frontend:
+  replicaCount: 1
+  image:
+    repository: localhost/energy_reading/frontend
+    tag: latest
+    pullPolicy: IfNotPresent
+  service:
+    type: LoadBalancer
+    port: 8080
+  env:
+    producerUrl: "http://producer:8000"
+    consumerUrl: "http://consumer:8000"
+  resources:
+    limits:
+      cpu: 500m
+      memory: 512Mi
+    requests:
+      cpu: 200m
+      memory: 256Mi
+
 # Redis Configuration
 redis:
   image: redis:7-alpine
   port: 6379
+  service:
+    port: 6379
+    type: ClusterIP
   resources:
     limits:
       cpu: 200m

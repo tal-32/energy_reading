@@ -4,6 +4,7 @@ metadata:
   name: consumer
   labels:
     {{- include "energy-reading.labels" . | nindent 4 }}
+    {{- include "consumer.selectorLabels" . | nindent 4 }}
 spec:
   # Note: KEDA will override this value once scaling starts
   replicas: {{ .Values.consumer.replicaCount }}

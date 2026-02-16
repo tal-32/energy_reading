@@ -4,6 +4,7 @@ metadata:
   name: redis
   labels:
     {{- include "energy-reading.labels" . | nindent 4 }}
+    {{- include "redis.selectorLabels" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
