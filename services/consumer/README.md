@@ -10,6 +10,8 @@ Returns all stored readings for the given site
 ### /health
 Returns 200 if the service is healthy
 currently it does nothing but it could check the following
+
+*/health/check concept*
 - invalid `power_reading` value range
 - less than `x` `power_reading` from `device_id` in the past `y` minutes
 - no `ACK` from `redis service`

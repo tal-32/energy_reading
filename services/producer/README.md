@@ -7,6 +7,8 @@ return `422` if getting missing params
 ### /health
 Returns 200 if the service is healthy
 currently it does nothing but it could check the following
+
+*/health/check concept*
 - low space
 - unable to reach `redis service` or other related error (example missing site)
 - got unexpected struct
